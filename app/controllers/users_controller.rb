@@ -25,19 +25,21 @@ class UsersController < ApplicationController
   
   def show
     @user = User.find(params[:id])
+    @microposts = @user.microposts.paginate(page: params[:page])
   end
   
   def edit
     @user = User.find(params[:id])
   end
   
-  def update
-    @user = User.find(params[:id])
-    if @user.update_attributes(user_params)
-      flash[:success] = "Profile updated"
-      redirect_to @user
-    else
-      render 'edit'
+    def update
+      @user = User.find(params[:id])
+      if @user.update_attributes(user_params)
+        flash[:success] = "Profile updated"
+        redirect_to @user
+      else
+        render 'edit'
+      end
     end
   
   private
@@ -47,18 +49,20 @@ class UsersController < ApplicationController
     end
     
     def signed_in_user
-       store_location
-      redirect_to signin_url, notice: "Please sign in." unless signed_in?
+      unless signed_in?
+        flash[:danger] = "Пожалуйста войдите в систему"
+        store_location
+        redirect_to signin_url
+      end
     end
     
     def destroy
-    User.find(params[:id]).destroy
-    flash[:success] = "User deleted."
-    redirect_to users_url
+      User.find(params[:id]).destroy
+      flash[:success] = "User deleted."
+      redirect_to users_url
     end
     
     def admin_user
       redirect_to(root_url) unless current_user.admin?
     end
-  end
 end

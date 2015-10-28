@@ -8,6 +8,8 @@ class User < ActiveRecord::Base
   has_secure_password
   validates :password, presence: true, length: {minimum: 6}
   
+  has_many :microposts, dependent: :destroy
+  
   def User.new_remember_token
     SecureRandom.urlsafe_base64
   end
@@ -18,7 +20,7 @@ class User < ActiveRecord::Base
 
   private
 
-    def create_remember_token
-      self.remember_token = User.encrypt(User.new_remember_token)
-    end
+  def create_remember_token
+    self.remember_token = User.encrypt(User.new_remember_token)
+  end
 end
